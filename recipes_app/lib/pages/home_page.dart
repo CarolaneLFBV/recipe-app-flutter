@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:recipes_app/models/recipe.dart';
+import 'package:recipes_app/pages/recipe_page.dart';
 import 'package:recipes_app/services/data_service.dart';
 
 class HomePage extends StatefulWidget {
@@ -11,6 +12,7 @@ class HomePage extends StatefulWidget {
 
 
 class _HomePageState extends State<HomePage> {
+  String _mealTypeFilter = "";
 
   @override
   Widget build(BuildContext context) {
@@ -47,19 +49,43 @@ class _HomePageState extends State<HomePage> {
         children: [
           Padding(
             padding: const EdgeInsets.symmetric(horizontal: 5.0),
-            child: FilledButton(onPressed: () {}, child: const Text("🍿 Snack")),
+            child: FilledButton(onPressed: () {
+              setState(() {
+                _mealTypeFilter = "";
+              });
+            }, child: const Text("All")),
           ),
           Padding(
             padding: const EdgeInsets.symmetric(horizontal: 5.0),
-            child: FilledButton(onPressed: () {}, child: const Text("🥞 Breakfast")),
+            child: FilledButton(onPressed: () {
+              setState(() {
+                _mealTypeFilter = "snack";
+              });
+            }, child: const Text("🍿 Snack")),
           ),
           Padding(
             padding: const EdgeInsets.symmetric(horizontal: 5.0),
-            child: FilledButton(onPressed: () {}, child: const Text("🥗 Lunch")),
+            child: FilledButton(onPressed: () {
+              setState(() {
+                _mealTypeFilter = "breakfast";
+              });
+            }, child: const Text("🥞 Breakfast")),
           ),
           Padding(
             padding: const EdgeInsets.symmetric(horizontal: 5.0),
-            child: FilledButton(onPressed: () {}, child: const Text("🥘 Dinner")),
+            child: FilledButton(onPressed: () {
+              setState(() {
+                _mealTypeFilter = "lunch";
+              });
+            }, child: const Text("🥗 Lunch")),
+          ),
+          Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 5.0),
+            child: FilledButton(onPressed: () {
+              setState(() {
+                _mealTypeFilter = "dinner";
+              });
+            }, child: const Text("🥘 Dinner")),
           ),
         ],
       ),
@@ -69,7 +95,7 @@ class _HomePageState extends State<HomePage> {
   Widget _recipesList() {
     return Expanded(child: 
       FutureBuilder(
-        future: DataService().getRecipes(), 
+        future: DataService().getRecipes(_mealTypeFilter), 
         builder: (context, snapshot) { 
           if (snapshot.connectionState == ConnectionState.waiting) {
             return const Center(child: CircularProgressIndicator());
@@ -86,6 +112,12 @@ class _HomePageState extends State<HomePage> {
             itemBuilder: (context, index) {
               Recipe recipe = snapshot.data![index];
               return ListTile(
+                onTap: () {
+                  Navigator.push(context, MaterialPageRoute(builder: (context) {
+                    return RecipePage(recipe: recipe,);
+                  }),
+                  );
+                },
                 contentPadding: const EdgeInsets.only(top: 20.0),
                 isThreeLine: true,
                 title: Text(recipe.name),
